@@ -860,6 +860,20 @@ static PyMethodDef module_methods[] = {
     {NULL} };
 
 
+
+#if PY_MAJOR_VERSION >= 3
+static struct PyModuleDef moduledef = {
+    PyModuleDef_HEAD_INIT,
+    "_faststat",     /* m_name */
+    "Fast streaming statistics",  /* m_doc */
+    -1,                  /* m_size */
+    module_methods,    /* m_methods */
+    NULL,                /* m_reload */
+    NULL,                /* m_traverse */
+    NULL,                /* m_clear */
+    NULL,                /* m_free */
+};
+#endif
 #ifndef PyMODINIT_FUNC  /* declarations for DLL import/export */
 #define PyMODINIT_FUNC void
 #endif
@@ -869,8 +883,11 @@ PyMODINIT_FUNC init_faststat(void) {
     if(PyType_Ready(&faststat_StatsType) < 0)
         return;
 
+#if PY_MAJOR_VERSION >= 3
+    module = PyModule_Create(&moduledef);
+#else
     module = Py_InitModule3("_faststat", module_methods, "fast statistics");
-
+#endif
     if(module == NULL)
         return;
 
